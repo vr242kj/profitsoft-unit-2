@@ -2,23 +2,32 @@ package com.example.jsontoxml2.service;
 
 import com.example.jsontoxml2.entity.Post;
 import com.example.jsontoxml2.repository.PostRepository;
-import lombok.RequiredArgsConstructor;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 @Service
-@RequiredArgsConstructor
 public class PostService {
 
+    private static final ObjectMapper mapper = new ObjectMapper();
     private final PostRepository postRepository;
+
+    public PostService(PostRepository postRepository) {
+        this.postRepository = postRepository;
+    }
 
     public Post getPostById(Long id) {
         return postRepository.findById(id).orElse(null);
@@ -28,23 +37,34 @@ public class PostService {
         return postRepository.save(post);
     }
 
-    public Map<String, Integer> importPosts(List<Post> posts) {
+
+    public Map<String, Integer> importPosts(MultipartFile file) {
         int successfulImports = 0;
         int failedImports = 0;
 
-        for (Post post : posts) {
-            try {
-                postRepository.save(post);
-                successfulImports++;
-            } catch (Exception e) {
-                failedImports++;
+        try (InputStream inputStream = file.getInputStream();
+             JsonParser parser = mapper.getFactory().createParser(inputStream)) {
+
+            if (parser.nextToken() != JsonToken.START_ARRAY) {
+                throw new IllegalArgumentException("Invalid JSON format: expected array");
             }
+
+            while (parser.nextToken() != JsonToken.END_ARRAY) {
+                Post post = mapper.readValue(parser, Post.class);
+                try {
+                    postRepository.save(post);
+                    successfulImports++;
+                } catch (Exception e) {
+                    failedImports++;
+                }
+            }
+        } catch (IOException e) {
+            failedImports++;
         }
 
         Map<String, Integer> response = new HashMap<>();
         response.put("successfulImports", successfulImports);
         response.put("failedImports", failedImports);
-
         return response;
     }
 

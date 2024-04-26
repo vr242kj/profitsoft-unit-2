@@ -5,6 +5,7 @@ import com.example.jsontoxml2.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,10 +15,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URI;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -43,8 +45,11 @@ public class PostController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<Map<String, Integer>> uploadPosts(@RequestBody List<Post> posts) {
-        Map<String, Integer> response = postService.importPosts(posts);
+    public ResponseEntity<Map<String, Integer>> uploadPosts(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("Empty file, successfulImports", 0));
+        }
+        Map<String, Integer> response = postService.importPosts(file);
         return ResponseEntity.ok(response);
     }
 
