@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: JsonToXml2
+
+  # Database
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5436/social_media
+    username: postgres
+    password: Olimp123
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+# Server configuration
+server:
+  port: 8081
