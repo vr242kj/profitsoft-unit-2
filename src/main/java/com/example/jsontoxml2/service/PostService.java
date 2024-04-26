@@ -2,6 +2,7 @@ package com.example.jsontoxml2.service;
 
 import com.example.jsontoxml2.entity.Post;
 import com.example.jsontoxml2.repository.PostRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -14,13 +15,10 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class PostService {
 
     private final PostRepository postRepository;
-
-    public PostService(PostRepository postRepository) {
-        this.postRepository = postRepository;
-    }
 
     public Post getPostById(Long id) {
         return postRepository.findById(id).orElse(null);
@@ -89,7 +87,7 @@ public class PostService {
                     .append(post.getTitle()).append(";")
                     .append(post.getContent()).append(";")
                     .append(post.getLikesCount()).append(";")
-                    .append(post.getPublished()).append("\n");
+                    .append(post.getIsPublished()).append("\n");
         }
 
         byte[] csvBytes = csvContent.toString().getBytes();

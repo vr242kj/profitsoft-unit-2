@@ -2,17 +2,15 @@ package com.example.jsontoxml2.service;
 
 import com.example.jsontoxml2.entity.User;
 import com.example.jsontoxml2.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     public List<User> getAllUsers() {
         return userRepository.findAll();

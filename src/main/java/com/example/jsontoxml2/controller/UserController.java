@@ -2,6 +2,7 @@ package com.example.jsontoxml2.controller;
 
 import com.example.jsontoxml2.entity.User;
 import com.example.jsontoxml2.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -18,14 +19,10 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/users")
 public class UserController {
-
     private final UserService userService;
-
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
 
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {

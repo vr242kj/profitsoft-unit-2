@@ -2,6 +2,7 @@ package com.example.jsontoxml2.controller;
 
 import com.example.jsontoxml2.entity.Post;
 import com.example.jsontoxml2.service.PostService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -21,13 +22,10 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/posts")
 public class PostController {
     private final PostService postService;
-
-    public PostController(PostService postService) {
-        this.postService = postService;
-    }
 
     @GetMapping("/{id}")
     public ResponseEntity<Post> getPostById(@PathVariable long id) {
@@ -65,8 +63,8 @@ public class PostController {
         if (updatePost.getContent() != null) {
             existingPost.setContent(updatePost.getContent());
         }
-        if (updatePost.getPublished() != null) {
-            existingPost.setPublished(updatePost.getPublished());
+        if (updatePost.getIsPublished() != null) {
+            existingPost.setIsPublished(updatePost.getIsPublished());
         }
         if (updatePost.getLikesCount() != null) {
             existingPost.setLikesCount(updatePost.getLikesCount());
