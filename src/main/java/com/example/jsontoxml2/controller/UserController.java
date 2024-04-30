@@ -1,10 +1,10 @@
 package com.example.jsontoxml2.controller;
 
-import com.example.jsontoxml2.entity.User;
+import com.example.jsontoxml2.model.entity.User;
 import com.example.jsontoxml2.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/users")
 public class UserController {
+
     private final UserService userService;
 
     @GetMapping
@@ -30,7 +31,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<User> addUser(@Validated @RequestBody User newUser) {
+    public ResponseEntity<User> addUser(@Valid @RequestBody User newUser) {
         var savedUser = userService.addUser(newUser);
         return ResponseEntity
                 .created(URI.create(String.format("/users/%d", savedUser.getId())))
@@ -38,19 +39,8 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> updatePost(@PathVariable long id, @Validated @RequestBody User updateUser) {
-        User existingUser = userService.getUserById(id);
-        if (existingUser == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        if (updateUser.getEmail() != null) {
-            existingUser.setEmail(updateUser.getEmail());
-        }
-        if (updateUser.getUsername() != null) {
-            existingUser.setUsername(updateUser.getUsername());
-        }
-        userService.addUser(existingUser);
+    public ResponseEntity<String> updatePost(@PathVariable long id, @Valid @RequestBody User updatedUser) {
+        userService.updateUser(id, updatedUser);
         return ResponseEntity.ok().body("Post updated successfully");
     }
 

@@ -1,11 +1,10 @@
 package com.example.jsontoxml2.controller;
 
-import com.example.jsontoxml2.entity.Post;
+import com.example.jsontoxml2.model.entity.Post;
 import com.example.jsontoxml2.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,18 +20,18 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URI;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/posts")
 public class PostController {
+
     private final PostService postService;
 
     @GetMapping("/{id}")
     public ResponseEntity<Post> getPostById(@PathVariable long id) {
-        Optional<Post> post = Optional.ofNullable(postService.getPostById(id));
-        return post.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+        var post = postService.getPostById(id);
+        return ResponseEntity.ok(post);
     }
 
     // add validation
@@ -44,37 +43,9 @@ public class PostController {
                 .body(savedPost);
     }
 
-    @PostMapping("/upload")
-    public ResponseEntity<Map<String, Integer>> uploadPosts(@RequestParam("file") MultipartFile file) {
-        if (file.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("Empty file, successfulImports", 0));
-        }
-        Map<String, Integer> response = postService.importPosts(file);
-        return ResponseEntity.ok(response);
-    }
-
     @PutMapping("/{id}")
     public ResponseEntity<String> updatePost(@PathVariable long id, @RequestBody Post updatePost) {
-        System.out.println("existingPost " + updatePost.toString());
-
-        Post existingPost = postService.getPostById(id);
-        if (existingPost == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        if (updatePost.getTitle() != null) {
-            existingPost.setTitle(updatePost.getTitle());
-        }
-        if (updatePost.getContent() != null) {
-            existingPost.setContent(updatePost.getContent());
-        }
-        if (updatePost.getIsPublished() != null) {
-            existingPost.setIsPublished(updatePost.getIsPublished());
-        }
-        if (updatePost.getLikesCount() != null) {
-            existingPost.setLikesCount(updatePost.getLikesCount());
-        }
-        postService.addPost(existingPost);
+        postService.updatePost(id, updatePost);
         return ResponseEntity.ok().body("Post updated successfully");
     }
 
@@ -82,6 +53,12 @@ public class PostController {
     public ResponseEntity<String> deletePostById(@PathVariable long id) {
         postService.deletePost(id);
         return ResponseEntity.ok("Post deleted successfully.");
+    }
+
+    @PostMapping("/upload")
+    public ResponseEntity<Map<String, Integer>> uploadPosts(@RequestParam("file") MultipartFile file) throws Exception {
+        Map<String, Integer> response = postService.importPosts(file);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/_list")
@@ -102,4 +79,5 @@ public class PostController {
                 .contentType(MediaType.parseMediaType("text/csv"))
                 .body(resource);
     }
+
 }

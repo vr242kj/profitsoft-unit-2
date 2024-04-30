@@ -1,6 +1,5 @@
 package com.example.jsontoxml2.controller.exceptionHandler;
 
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 
@@ -10,6 +9,7 @@ import java.util.List;
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ErrorResponse {
+
     private final LocalDateTime dateTime;
     private List<ErrorDetail> errors;
     private String errorMessage;

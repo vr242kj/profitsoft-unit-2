@@ -1,7 +1,5 @@
-package com.example.jsontoxml2.entity;
+package com.example.jsontoxml2.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,8 +9,9 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.Size;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,41 +20,43 @@ import lombok.ToString;
 
 @Entity
 @Getter
-@Setter
 @ToString
 @EqualsAndHashCode
 @NoArgsConstructor
-@AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@Table(name = "posts", indexes = @Index(columnList = "user_id"))
+@Table(name = "posts", indexes = {
+        @Index(columnList = "user_id"),
+        @Index(columnList = "published"),
+        @Index(columnList = "likes_count")})
 public class Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Setter
     @Column(name = "title")
+    @NotBlank(message = "Title is required")
+    @Size(max = 100, message = "Title must be at most 100 characters")
     private String title;
 
+    @Setter
     @Column(name = "content")
+    @NotBlank(message = "Text is required")
+    @Size(max = 500, message = "Text must be at most 500 characters")
     private String content;
 
+    @Setter
+    @NotNull
     @Column(name = "published")
     private Boolean isPublished;
 
+    @Setter
     @Column(name = "likes_count")
-    private Integer likesCount;
+    private Integer likesCount = 0;
 
     @NotNull
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    public Post(String title, String content, User user, Boolean isPublished) {
-        this.title = title;
-        this.content = content;
-        this.isPublished = isPublished;
-        this.likesCount = 0;
-        this.user = user;
-    }
 }

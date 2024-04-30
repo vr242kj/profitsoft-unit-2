@@ -1,5 +1,7 @@
 package com.example.jsontoxml2.controller.exceptionHandler;
 
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -21,10 +23,26 @@ public class GlobalExceptionHandler {
         ErrorResponse response = new ErrorResponse(LocalDateTime.now(), errors);
         return ResponseEntity.badRequest().body(response);
     }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleEntityNotFound(EntityNotFoundException ex) {
+        String errorMessage = "An error occurred: " + ex.getMessage();
+        ErrorResponse response = new ErrorResponse(LocalDateTime.now(), errorMessage);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex) {
+        String errorMessage = "Invalid argument: " + ex.getMessage();
+        ErrorResponse response = new ErrorResponse(LocalDateTime.now(), errorMessage);
+        return ResponseEntity.badRequest().body(response);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception ex) {
         String errorMessage = "An error occurred: " + ex.getMessage();
         ErrorResponse response = new ErrorResponse(LocalDateTime.now(), errorMessage);
-        return ResponseEntity.badRequest().body(response);
+        return ResponseEntity.internalServerError().body(response);
     }
+
 }
