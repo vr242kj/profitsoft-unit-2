@@ -2,6 +2,7 @@ package com.example.jsontoxml2.controller;
 
 import com.example.jsontoxml2.model.entity.Post;
 import com.example.jsontoxml2.service.PostService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
@@ -44,7 +45,7 @@ public class PostController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> updatePost(@PathVariable long id, @RequestBody Post updatePost) {
+    public ResponseEntity<String> updatePost(@PathVariable long id,@Valid @RequestBody Post updatePost) {
         postService.updatePost(id, updatePost);
         return ResponseEntity.ok().body("Post updated successfully");
     }

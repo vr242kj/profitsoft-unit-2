@@ -51,7 +51,7 @@ public class Post {
     private Boolean isPublished;
 
     @Setter
-    @Column(name = "likes_count")
+    @Column(name = "likes_count", nullable = false)
     private Integer likesCount = 0;
 
     @NotNull
