@@ -1,11 +1,15 @@
-package com.example.jsontoxml2.model.dto;
+package com.example.jsontoxml2.model.dto.post;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
+@NoArgsConstructor
 @AllArgsConstructor
-public class PostDto {
+public class PostDTO {
 
     private Long id;
     private String title;
@@ -13,9 +17,5 @@ public class PostDto {
     private Boolean isPublished;
     private Integer likesCount;
     private Long userId;
-
-    public String toCSV() {
-        return String.format("%d;%s;%s;%d;%b;%d", id, title, content, likesCount, isPublished, userId);
-    }
 
 }

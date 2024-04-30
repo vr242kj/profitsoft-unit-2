@@ -9,54 +9,44 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 @Entity
 @Getter
-@ToString
-@EqualsAndHashCode
+@Setter
 @NoArgsConstructor
 @Table(name = "posts", indexes = {
-        @Index(columnList = "user_id"),
-        @Index(columnList = "published"),
-        @Index(columnList = "likes_count")})
+        @Index(name = "user_index", columnList = "user_id"),
+        @Index(name = "multiIndexUserAndPublished", columnList = "user_id, published"),
+        @Index(name = "multiIndexUserAndLikedCount", columnList = "user_id, likes_count"),
+        @Index(name = "multiIndexUserAndFilters", columnList = "user_id, published, likes_count")
+})
 public class Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Setter
     @Column(name = "title")
-    @NotBlank(message = "Title is required")
-    @Size(max = 100, message = "Title must be at most 100 characters")
     private String title;
 
-    @Setter
     @Column(name = "content")
-    @NotBlank(message = "Text is required")
-    @Size(max = 500, message = "Text must be at most 500 characters")
     private String content;
 
-    @Setter
-    @NotNull
     @Column(name = "published")
     private Boolean isPublished;
 
-    @Setter
-    @Column(name = "likes_count", nullable = false)
+    @Column(name = "likes_count")
     private Integer likesCount = 0;
 
-    @NotNull
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    public String toCSV() {
+        return String.format("%d;%s;%s;%d;%b;%d", id, title, content, likesCount, isPublished, user.getId());
+    }
 
 }

@@ -1,6 +1,8 @@
 package com.example.jsontoxml2.controller;
 
-import com.example.jsontoxml2.model.entity.Post;
+import com.example.jsontoxml2.model.dto.post.PostCreateRequestDTO;
+import com.example.jsontoxml2.model.dto.post.PostDTO;
+import com.example.jsontoxml2.model.dto.post.PostUpdateRequestDTO;
 import com.example.jsontoxml2.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,14 +32,13 @@ public class PostController {
     private final PostService postService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<Post> getPostById(@PathVariable long id) {
+    public ResponseEntity<PostDTO> getPostById(@PathVariable long id) {
         var post = postService.getPostById(id);
         return ResponseEntity.ok(post);
     }
 
-    // add validation
     @PostMapping
-    public ResponseEntity<Post> savePost(@RequestBody Post newPost) {
+    public ResponseEntity<PostDTO> savePost(@Valid @RequestBody PostCreateRequestDTO newPost) {
         var savedPost = postService.addPost(newPost);
         return ResponseEntity
                 .created(URI.create(String.format("/%d", savedPost.getId())))
@@ -45,7 +46,7 @@ public class PostController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> updatePost(@PathVariable long id,@Valid @RequestBody Post updatePost) {
+    public ResponseEntity<String> updatePost(@PathVariable long id, @Valid @RequestBody PostUpdateRequestDTO updatePost) {
         postService.updatePost(id, updatePost);
         return ResponseEntity.ok().body("Post updated successfully");
     }
