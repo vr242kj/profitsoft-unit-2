@@ -18,6 +18,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
 @Table(name = "users")
 public class User {
@@ -26,11 +27,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Setter
     @Column(name = "username", unique = true)
     private String username;
 
-    @Setter
     @Column(name = "email", unique = true)
     private String email;
 

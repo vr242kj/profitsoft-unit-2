@@ -1,6 +1,7 @@
 package com.example.jsontoxml2.service;
 
-import com.example.jsontoxml2.model.dto.user.UserDTO;
+import com.example.jsontoxml2.model.dto.user.UserInputDto;
+import com.example.jsontoxml2.model.dto.user.UserWithoutPostsDto;
 import com.example.jsontoxml2.model.entity.User;
 import com.example.jsontoxml2.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -18,10 +19,10 @@ public class UserService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
 
-    public List<UserDTO> getAllUsers() {
+    public List<UserWithoutPostsDto> getAllUsers() {
         List<User> users = userRepository.findAll();
         return users.stream()
-                .map(user -> modelMapper.map(user, UserDTO.class))
+                .map(user -> modelMapper.map(user, UserWithoutPostsDto.class))
                 .collect(Collectors.toList());
     }
 
@@ -30,22 +31,17 @@ public class UserService {
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
     }
 
-    public UserDTO addUser(UserDTO userDTO) {
-        User user = modelMapper.map(userDTO, User.class);
+    public UserWithoutPostsDto addUser(UserInputDto userInputDto) {
+        User user = modelMapper.map(userInputDto, User.class);
         User savedUser = userRepository.save(user);
-        return modelMapper.map(savedUser, UserDTO.class);
+        return modelMapper.map(savedUser, UserWithoutPostsDto.class);
     }
 
-    public void updateUser(Long id, UserDTO updatedUserDTO) {
-        User existingUser = getUserById(id);
-
-        if (updatedUserDTO.getEmail() != null) {
-            existingUser.setEmail(updatedUserDTO.getEmail());
-        }
-        if (updatedUserDTO.getUsername() != null) {
-            existingUser.setUsername(updatedUserDTO.getUsername());
-        }
-        userRepository.save(existingUser);
+    public void updateUser(Long id, UserInputDto updatedUserInputDto) {
+        getUserById(id);
+        User user = modelMapper.map(updatedUserInputDto, User.class);
+        user.setId(id);
+        userRepository.save(user);
     }
 
     public void deleteUser(Long id) {

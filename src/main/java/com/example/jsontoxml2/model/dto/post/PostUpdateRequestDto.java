@@ -1,6 +1,6 @@
 package com.example.jsontoxml2.model.dto.post;
 
-import com.example.jsontoxml2.model.entity.User;
+import com.example.jsontoxml2.model.dto.user.UserIdDto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -9,7 +9,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class PostUpdateRequestDTO {
+public class PostUpdateRequestDto {
 
     @NotBlank(message = "Title is required")
     @Size(max = 100, message = "Title must be at most 100 characters")
@@ -26,6 +26,6 @@ public class PostUpdateRequestDTO {
     private Integer likesCount;
 
     @NotNull
-    private User user;
+    private UserIdDto user;
 
 }

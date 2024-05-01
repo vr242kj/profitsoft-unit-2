@@ -1,8 +1,8 @@
 package com.example.jsontoxml2.controller;
 
-import com.example.jsontoxml2.model.dto.post.PostCreateRequestDTO;
-import com.example.jsontoxml2.model.dto.post.PostDTO;
-import com.example.jsontoxml2.model.dto.post.PostUpdateRequestDTO;
+import com.example.jsontoxml2.model.dto.post.PostCreateRequestDto;
+import com.example.jsontoxml2.model.dto.post.PostDto;
+import com.example.jsontoxml2.model.dto.post.PostUpdateRequestDto;
 import com.example.jsontoxml2.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,13 +32,13 @@ public class PostController {
     private final PostService postService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<PostDTO> getPostById(@PathVariable long id) {
+    public ResponseEntity<PostDto> getPostById(@PathVariable long id) {
         var post = postService.getPostById(id);
         return ResponseEntity.ok(post);
     }
 
     @PostMapping
-    public ResponseEntity<PostDTO> savePost(@Valid @RequestBody PostCreateRequestDTO newPost) {
+    public ResponseEntity<PostDto> savePost(@Valid @RequestBody PostCreateRequestDto newPost) {
         var savedPost = postService.addPost(newPost);
         return ResponseEntity
                 .created(URI.create(String.format("/%d", savedPost.getId())))
@@ -46,7 +46,7 @@ public class PostController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> updatePost(@PathVariable long id, @Valid @RequestBody PostUpdateRequestDTO updatePost) {
+    public ResponseEntity<String> updatePost(@PathVariable long id, @Valid @RequestBody PostUpdateRequestDto updatePost) {
         postService.updatePost(id, updatePost);
         return ResponseEntity.ok().body("Post updated successfully");
     }
@@ -58,7 +58,7 @@ public class PostController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<Map<String, Integer>> uploadPosts(@RequestParam("file") MultipartFile file) throws Exception {
+    public ResponseEntity<Map<String, Integer>> uploadPosts(@RequestParam("file") MultipartFile file) {
         Map<String, Integer> response = postService.importPosts(file);
         return ResponseEntity.ok(response);
     }

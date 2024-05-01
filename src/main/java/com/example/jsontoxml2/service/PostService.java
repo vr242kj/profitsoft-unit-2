@@ -1,14 +1,17 @@
 package com.example.jsontoxml2.service;
 
-import com.example.jsontoxml2.model.dto.post.PostCreateRequestDTO;
-import com.example.jsontoxml2.model.dto.post.PostDTO;
-import com.example.jsontoxml2.model.dto.post.PostUpdateRequestDTO;
+import com.example.jsontoxml2.model.dto.post.PostCreateRequestDto;
+import com.example.jsontoxml2.model.dto.post.PostDto;
+import com.example.jsontoxml2.model.dto.post.PostUpdateRequestDto;
 import com.example.jsontoxml2.model.entity.Post;
 import com.example.jsontoxml2.repository.PostRepository;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.core.io.ByteArrayResource;
@@ -19,10 +22,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -30,24 +33,24 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final ModelMapper modelMapper;
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    public PostDTO getPostById(Long id) {
+    public PostDto getPostById(Long id) {
         Post postById = postRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Post not found with id: " + id));
 
-        return modelMapper.map(postById, PostDTO.class);
+        return modelMapper.map(postById, PostDto.class);
     }
 
-    public PostDTO addPost(PostCreateRequestDTO postDTO) {
-        Post post = modelMapper.map(postDTO, Post.class);
+    public PostDto addPost(PostCreateRequestDto postDto) {
+        Post post = modelMapper.map(postDto, Post.class);
         Post savedPost = postRepository.save(post);
-        return modelMapper.map(savedPost, PostDTO.class);
+        return modelMapper.map(savedPost, PostDto.class);
     }
 
-    public void updatePost(long id, PostUpdateRequestDTO updatedPostDTO) {
+    public void updatePost(long id, PostUpdateRequestDto updatedPostDto) {
         getPostById(id);
-        Post post = modelMapper.map(updatedPostDTO, Post.class);
+        Post post = modelMapper.map(updatedPostDto, Post.class);
         post.setId(id);
         postRepository.save(post);
     }
@@ -57,32 +60,45 @@ public class PostService {
         postRepository.deleteById(id);
     }
 
-    public Map<String, Integer> importPosts(MultipartFile file) throws Exception {
+    public Map<String, Integer> importPosts(MultipartFile file) {
         int successfulImports = 0;
         int failedImports = 0;
 
-        try (InputStream inputStream = file.getInputStream();
-             JsonParser parser = mapper.getFactory().createParser(inputStream)) {
-            validateFile(file);
-            validateJsonFormat(parser);
+        List<PostCreateRequestDto> postsFromFile = readPostsFromFile(file);
+        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
-            while (parser.nextToken() != JsonToken.END_ARRAY) {
+        for (PostCreateRequestDto postCreateRequestDto : postsFromFile) {
+            Set<ConstraintViolation<PostCreateRequestDto>> violations = validator.validate(postCreateRequestDto);
+
+            if (violations.isEmpty()) {
                 try {
-                    Post post = mapper.readValue(parser, Post.class);
+                    Post post = modelMapper.map(postCreateRequestDto, Post.class);
                     postRepository.save(post);
                     successfulImports++;
                 } catch (Exception e) {
                     failedImports++;
                 }
+            } else {
+                failedImports++;
             }
-        } catch (FileNotFoundException e) {
-            throw new IllegalArgumentException("The provided file does not exist");
-        } catch (IOException e) {
-            throw new Exception("Failed to import data due to I/O error");
         }
 
         return buildResponseMap(successfulImports, failedImports);
     }
+
+    private List<PostCreateRequestDto> readPostsFromFile(MultipartFile file) {
+        try (InputStream inputStream = file.getInputStream()) {
+            validateFile(file);
+            return objectMapper.readValue(inputStream, new TypeReference<>() {});
+        } catch (FileNotFoundException e) {
+            throw new IllegalArgumentException("The provided file does not exist");
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException("The provided file has invalid JSON format", e);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to import data due to I/O error");
+        }
+    }
+
 
     private void validateFile(MultipartFile file) {
         if (file.isEmpty()) {
@@ -90,17 +106,11 @@ public class PostService {
         }
     }
 
-    private void validateJsonFormat(JsonParser parser) throws IOException {
-        if (parser.nextToken() != JsonToken.START_ARRAY) {
-            throw new IllegalArgumentException("Invalid JSON format: expected array");
-        }
-    }
-
     private Map<String, Integer> buildResponseMap(int successfulImports, int failedImports) {
-        Map<String, Integer> response = new HashMap<>();
-        response.put("successfulImports", successfulImports);
-        response.put("failedImports", failedImports);
-        return response;
+        return Map.ofEntries(
+                Map.entry("successfulImports", successfulImports),
+                Map.entry("failedImports", failedImports)
+        );
     }
 
     public Map<String, Object> getPostsByUserIdAndFilters(Map<String, Object> filters) {
