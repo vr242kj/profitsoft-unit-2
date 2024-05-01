@@ -4,7 +4,8 @@ import com.example.jsontoxml2.model.dto.post.PostCreateRequestDto;
 import com.example.jsontoxml2.model.dto.post.PostDto;
 import com.example.jsontoxml2.model.dto.post.PostUpdateRequestDto;
 import com.example.jsontoxml2.model.entity.Post;
-import com.example.jsontoxml2.repository.PostRepository;
+import com.example.jsontoxml2.repository.post.PostRepository;
+import com.example.jsontoxml2.repository.post.PostSpecifications;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,6 +16,7 @@ import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,10 +24,12 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -99,7 +103,6 @@ public class PostService {
         }
     }
 
-
     private void validateFile(MultipartFile file) {
         if (file.isEmpty()) {
             throw new IllegalArgumentException("The provided file is empty");
@@ -117,11 +120,17 @@ public class PostService {
         int pageNumber = validatePaginationParameters((Integer) filters.get("page"), "page");
         int pageSize = validatePaginationParameters((Integer) filters.get("size"), "size");
 
-        List<Post> filteredPosts =
-                postRepository.findByUserIdAndFiltersWithPagination(filters, PageRequest.of(pageNumber - 1, pageSize));
+        List<Post> filteredPosts = getCustomerListFromPage(filters, pageNumber, pageSize);
         int totalPages = calculateTotalPages(filters, pageSize);
 
         return buildResponse(filteredPosts, totalPages);
+    }
+
+    private List<Post> getCustomerListFromPage(Map<String, Object> filters, int pageNumber, int pageSize) {
+        Page<Post> filteredPosts = postRepository.findAll(PostSpecifications.withUserIdAndFilters(filters),
+                PageRequest.of(pageNumber - 1, pageSize));
+
+        return filteredPosts.hasContent() ? filteredPosts.getContent() : Collections.emptyList();
     }
 
     private int validatePaginationParameters(Integer value, String parameterName) {
@@ -134,19 +143,23 @@ public class PostService {
     }
 
     private int calculateTotalPages(Map<String, Object> filters, int pageSize) {
-        int countFilteredPosts = postRepository.countByUserIdAndFilters(filters);
+        long countFilteredPosts = postRepository.count(PostSpecifications.withUserIdAndFilters(filters));
         return (int) Math.ceil((double) countFilteredPosts / pageSize);
     }
 
     private Map<String, Object> buildResponse(List<Post> filteredPosts, int totalPages) {
         Map<String, Object> response = new LinkedHashMap<>();
-        response.put("list", filteredPosts);
+        List<PostDto> postDtoList = filteredPosts.stream()
+                .map(post -> modelMapper.map(post, PostDto.class))
+                .collect(Collectors.toList());
+
+        response.put("list", postDtoList);
         response.put("totalPages", totalPages);
         return response;
     }
 
     public ByteArrayResource generateCSVReport(Map<String, Object> filters) {
-        List<Post> filteredPosts = postRepository.findByUserIdAndFilters(filters);
+        List<Post> filteredPosts = postRepository.findAll(PostSpecifications.withUserIdAndFilters(filters));
         var csvContent = new StringBuilder();
 
         csvContent.append("Post ID;Title;Content;Likes Count;Published;User ID\n");

@@ -1,4 +1,4 @@
-package com.example.jsontoxml2.repository;
+package com.example.jsontoxml2.repository.user;
 
 import com.example.jsontoxml2.model.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;

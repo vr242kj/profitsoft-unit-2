@@ -3,7 +3,7 @@ package com.example.jsontoxml2.service;
 import com.example.jsontoxml2.model.dto.user.UserInputDto;
 import com.example.jsontoxml2.model.dto.user.UserWithoutPostsDto;
 import com.example.jsontoxml2.model.entity.User;
-import com.example.jsontoxml2.repository.UserRepository;
+import com.example.jsontoxml2.repository.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
