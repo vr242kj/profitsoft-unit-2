@@ -1,4 +1,4 @@
-# JsonToXML2
+# profitsoft unit 2
 This project is a Spring Boot application that serves as a RESTful API for managing entities related to user posts and users themselves. The application uses PostgreSQL as its database backend and provides endpoints to perform CRUD (Create, Read, Update, Delete) operations on these entities.   
 ## How to Run
 1. Install Docker and Docker Compose:
