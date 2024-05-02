@@ -71,7 +71,7 @@ public class PostController {
 
     @PostMapping("/_report")
     public ResponseEntity<ByteArrayResource> generateReport(@RequestBody Map<String, Object> request) {
-        ByteArrayResource resource = postService.generateCSVReport(request);
+        ByteArrayResource report = postService.generateCSVReport(request);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=report.csv");
@@ -79,7 +79,7 @@ public class PostController {
         return ResponseEntity.ok()
                 .headers(headers)
                 .contentType(MediaType.parseMediaType("text/csv"))
-                .body(resource);
+                .body(report);
     }
 
 }
