@@ -14,7 +14,7 @@ This project is a Spring Boot application that serves as a RESTful API for manag
 5 posts for user id 1 (3 true, 2 false)  
 3 posts for user id 2 (2 true, 1 false)
 ## Entity Information
-***Post Entity*** (many)
+**Post Entity** (many)
 
 The Post entity represents a post in the system. Each post contains a title, content, information about its publication status, the number of likes it has received, and a reference to the user who created the post.
 
@@ -26,9 +26,10 @@ Attributes:
 - **likes_count:** Number of likes received by the post.
 - **user_id:** Reference to the user who created the post.
 
-***User Entity*** (one)
+**User Entity** (one)
 
-The User entity represents a user in the system. Each user has a unique username and email address, and may have authored multiple posts.
+The User entity represents a user in the system. Each user has a unique username and email address, and may have authored multiple posts.  
+
 Attributes:
 - **id:** Unique identifier for the user.
 - **username:** Unique username of the user.
