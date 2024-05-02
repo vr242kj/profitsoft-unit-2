@@ -7,7 +7,7 @@ This project is a Spring Boot application that serves as a RESTful API for manag
 - Open your terminal or command prompt and navigate to the directory containing docker-compose.yml [file](https://github.com/vr242kj/JsonToXml2/blob/master/docker-compose.yml).
 3. Run Docker Compose:
 - To run in the background: ```docker compose up```
-4. Use collection API from Postman - [click]()
+4. Use collection API from Postman - [click](https://api.postman.com/collections/15327265-b611c88a-4a57-4f82-b6c8-38f3552c5a9a?access_key=PMAT-01HWXJCJADE0Y6KGERRQ5KC634)
 
 
 5. JSON file to import data - [click](https://github.com/vr242kj/JsonToXml2/blob/master/src/main/resources/posts.json)  
