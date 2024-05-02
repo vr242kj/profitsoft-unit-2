@@ -6,6 +6,7 @@ import com.example.jsontoxml2.model.dto.post.PostUpdateRequestDto;
 import com.example.jsontoxml2.model.entity.Post;
 import com.example.jsontoxml2.repository.post.PostRepository;
 import com.example.jsontoxml2.repository.post.PostSpecifications;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -93,6 +94,7 @@ public class PostService {
     private List<PostCreateRequestDto> readPostsFromFile(MultipartFile file) {
         try (InputStream inputStream = file.getInputStream()) {
             validateFile(file);
+            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             return objectMapper.readValue(inputStream, new TypeReference<>() {});
         } catch (FileNotFoundException e) {
             throw new IllegalArgumentException("The provided file does not exist");

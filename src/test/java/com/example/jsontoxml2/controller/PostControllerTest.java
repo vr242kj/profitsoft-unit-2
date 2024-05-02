@@ -73,12 +73,7 @@ class PostControllerTest {
     }
 
     private Post createPost(String title, String content, Boolean isPublished, UserIdDto user) {
-//        PostCreateRequestDto postCreateRequestDto = new PostCreateRequestDto(title, content, isPublished, user);
-        PostCreateRequestDto postCreateRequestDto = new PostCreateRequestDto();
-        postCreateRequestDto.setTitle(title);
-        postCreateRequestDto.setContent(content);
-        postCreateRequestDto.setIsPublished(isPublished);
-        postCreateRequestDto.setUser(user);
+        PostCreateRequestDto postCreateRequestDto = new PostCreateRequestDto(title, content, isPublished, user);
         return modelMapper.map(postCreateRequestDto, Post.class);
     }
 
@@ -118,16 +113,8 @@ class PostControllerTest {
     void testSavePost() throws Exception {
         // Given
         Long userId = user.getId();
-//        PostCreateRequestDto newPost = new PostCreateRequestDto("Test Post",
-//                "This is a test post content.", true, new UserIdDto(userId));
-
-        PostCreateRequestDto newPost = new PostCreateRequestDto();
-        newPost.setTitle("Test Post");
-        newPost.setContent("This is a test post content.");
-        newPost.setIsPublished(true);
-        newPost.setUser(new UserIdDto(userId));
-
-
+        PostCreateRequestDto newPost = new PostCreateRequestDto("Test Post",
+                "This is a test post content.", true, new UserIdDto(userId));
 
         // When
         MvcResult mvcResult = mvc.perform(post("/api/v1/posts")
@@ -312,6 +299,7 @@ class PostControllerTest {
         assertEquals(HttpStatus.OK.value(), status, "HTTP status should be 200 (OK)");
 
         String contentDisposition = mvcResult.getResponse().getHeader(HttpHeaders.CONTENT_DISPOSITION);
+        assertNotNull(contentDisposition, "Content-Disposition header should not be null");
         assertTrue(contentDisposition.contains("attachment; filename=report.csv"), "Content-Disposition header should indicate CSV file attachment");
         String contentType = mvcResult.getResponse().getContentType();
         assertEquals("text/csv", contentType, "Content-Type should be text/csv");
