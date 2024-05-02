@@ -1,17 +1,14 @@
 package com.example.jsontoxml2.model.dto.post;
 
 import com.example.jsontoxml2.model.dto.user.UserIdDto;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-//@AllArgsConstructor
 public class PostCreateRequestDto {
 
     @NotBlank(message = "Title is required")

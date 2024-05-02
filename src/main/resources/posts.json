@@ -1,0 +1,66 @@
+[
+  {
+    "title": "Post 1",
+    "content": "Content 1",
+    "isPublished": true,
+    "user": {
+      "id": 1
+    }
+  },
+  {
+    "title": "Post 2",
+    "content": "Content 2",
+    "isPublished": true,
+    "user": {
+      "id": 1
+    }
+  },
+  {
+    "title": "Post 3",
+    "content": "Content 3",
+    "isPublished": true,
+    "user": {
+      "id": 1
+    }
+  },
+  {
+    "title": "Post 4",
+    "content": "Content 4",
+    "isPublished": false,
+    "user": {
+      "id": 1
+    }
+  },
+  {
+    "title": "Post 5",
+    "content": "Content 5",
+    "isPublished": false,
+    "user": {
+      "id": 1
+    }
+  },
+  {
+    "title": "Post 6",
+    "content": "Content 6",
+    "isPublished": true,
+    "user": {
+      "id": 2
+    }
+  },
+  {
+    "title": "Post 7",
+    "content": "Content 7",
+    "isPublished": true,
+    "user": {
+      "id": 2
+    }
+  },
+  {
+    "title": "Post 8",
+    "content": "Content 8",
+    "isPublished": false,
+    "user": {
+      "id": 2
+    }
+  }
+]
