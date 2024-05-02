@@ -10,7 +10,7 @@ This project is a Spring Boot application that serves as a RESTful API for manag
 4. Use collection API from Postman - [click]()
 
 
-5. JSON file to import data - [click]()  
+5. JSON file to import data - [click](https://github.com/vr242kj/JsonToXml2/blob/master/src/main/resources/posts.json)  
 5 posts for user id 1 (3 true, 2 false)  
 3 posts for user id 2 (2 true, 1 false)
 ## Entity Information
