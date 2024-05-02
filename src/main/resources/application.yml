@@ -9,9 +9,10 @@ spring:
     username: postgres
     password: Olimp123
   jpa:
-    hibernate:
-      ddl-auto: update
     show-sql: true
+  liquibase:
+    change-log: classpath:/db.changelog/app-changelog.xml
+    default-schema: public
 
 # Server configuration
 server:

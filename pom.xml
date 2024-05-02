@@ -27,8 +27,7 @@
     </build>
 
     <dependencies>
-
-        <!--SPRING BOOT-->
+        <!--SPRING FRAMEWORK-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -47,10 +46,11 @@
             <scope>test</scope>
         </dependency>
 
-        <!--POSTGRESQL-->
+        <!--PERSISTENCE-->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
             <version>42.7.3</version>
         </dependency>
 
@@ -70,11 +70,11 @@
         </dependency>
 
         <!--LIQUIBASE-->
-<!--        <dependency>-->
-<!--            <groupId>org.liquibase</groupId>-->
-<!--            <artifactId>liquibase-core</artifactId>-->
-<!--            <version>4.27.0</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+            <version>4.27.0</version>
+        </dependency>
 
     </dependencies>
 </project>
