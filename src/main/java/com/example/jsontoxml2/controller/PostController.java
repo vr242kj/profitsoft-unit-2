@@ -1,13 +1,14 @@
 package com.example.jsontoxml2.controller;
 
 import com.example.jsontoxml2.model.dto.post.PostCreateRequestDto;
-import com.example.jsontoxml2.model.dto.post.PostDto;
+import com.example.jsontoxml2.model.dto.post.PostInfoDto;
+import com.example.jsontoxml2.model.dto.post.PostQueryDto;
+import com.example.jsontoxml2.model.dto.post.PostQueryWithPaginationDto;
 import com.example.jsontoxml2.model.dto.post.PostUpdateRequestDto;
 import com.example.jsontoxml2.service.PostService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,13 +33,13 @@ public class PostController {
     private final PostService postService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<PostDto> getPostById(@PathVariable long id) {
+    public ResponseEntity<PostInfoDto> getPostById(@PathVariable long id) {
         var post = postService.getPostById(id);
         return ResponseEntity.ok(post);
     }
 
     @PostMapping
-    public ResponseEntity<PostDto> savePost(@Valid @RequestBody PostCreateRequestDto newPost) {
+    public ResponseEntity<PostInfoDto> savePost(@Valid @RequestBody PostCreateRequestDto newPost) {
         var savedPost = postService.addPost(newPost);
         return ResponseEntity
                 .created(URI.create(String.format("/%d", savedPost.getId())))
@@ -64,22 +65,15 @@ public class PostController {
     }
 
     @PostMapping("/_list")
-    public ResponseEntity<Map<String, Object>> getPostList(@RequestBody Map<String, Object> request) {
-        Map<String, Object> response = postService.getPostsByUserIdAndFilters(request);
+    public ResponseEntity<Map<String, Object>> getPostList(
+            @Valid @RequestBody PostQueryWithPaginationDto postQueryWithPaginationDto) {
+        Map<String, Object> response = postService.getPostsByUserIdAndFilters(postQueryWithPaginationDto);
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/_report")
-    public ResponseEntity<ByteArrayResource> generateReport(@RequestBody Map<String, Object> request) {
-        ByteArrayResource report = postService.generateCSVReport(request);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=report.csv");
-
-        return ResponseEntity.ok()
-                .headers(headers)
-                .contentType(MediaType.parseMediaType("text/csv"))
-                .body(report);
+    @PostMapping(value = "/_report", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public void generateReport(HttpServletResponse response, @Valid @RequestBody PostQueryDto postQueryDto) {
+        postService.generateCSVReport(response, postQueryDto);
     }
 
 }

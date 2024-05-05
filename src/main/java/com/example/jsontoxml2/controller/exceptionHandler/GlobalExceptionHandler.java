@@ -1,6 +1,7 @@
 package com.example.jsontoxml2.controller.exceptionHandler;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -43,6 +44,25 @@ public class GlobalExceptionHandler {
         String errorMessage = "An error occurred: " + ex.getMessage();
         ErrorResponse response = new ErrorResponse(LocalDateTime.now(), errorMessage);
         return ResponseEntity.internalServerError().body(response);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException exception) {
+        String errorMessage = extractDetailErrorMessage(exception);
+        ErrorResponse response = new ErrorResponse(LocalDateTime.now(), errorMessage);
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    public static String extractDetailErrorMessage(DataIntegrityViolationException exception) {
+        String errorMessage = exception.getMessage();
+        int startIndex = errorMessage.indexOf("Detail:");
+        int endIndex = errorMessage.indexOf("]", startIndex);
+
+        if (startIndex != -1 && endIndex != -1) {
+            return errorMessage.substring(startIndex, endIndex);
+        }
+
+        return "Detail message not found.";
     }
 
 }

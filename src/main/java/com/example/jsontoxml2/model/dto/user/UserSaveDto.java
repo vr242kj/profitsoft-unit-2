@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserInputDto {
+public class UserSaveDto {
 
     @Column(name = "username", unique = true)
     @NotBlank(message = "Name is required")

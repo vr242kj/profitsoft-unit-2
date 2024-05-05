@@ -1,6 +1,6 @@
 spring:
   application:
-    name: JsonToXml2
+    name: profitsoft-unit-2
 
   # Database
   datasource:

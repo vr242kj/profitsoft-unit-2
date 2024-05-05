@@ -1,7 +1,7 @@
 package com.example.jsontoxml2.controller;
 
-import com.example.jsontoxml2.model.dto.user.UserInputDto;
-import com.example.jsontoxml2.model.dto.user.UserWithoutPostsDto;
+import com.example.jsontoxml2.model.dto.user.UserSaveDto;
+import com.example.jsontoxml2.model.dto.user.UserInfoDto;
 import com.example.jsontoxml2.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,14 +26,14 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public ResponseEntity<List<UserWithoutPostsDto>> getAllUsers() {
-        List<UserWithoutPostsDto> users = userService.getAllUsers();
+    public ResponseEntity<List<UserInfoDto>> getAllUsers() {
+        List<UserInfoDto> users = userService.getAllUsers();
         return ResponseEntity.ok(users);
     }
 
     @PostMapping
-    public ResponseEntity<UserWithoutPostsDto> addUser(@Valid @RequestBody UserInputDto newUserInputDto) {
-        var savedUser = userService.addUser(newUserInputDto);
+    public ResponseEntity<UserInfoDto> addUser(@Valid @RequestBody UserSaveDto newUserSaveDto) {
+        var savedUser = userService.addUser(newUserSaveDto);
         return ResponseEntity
                 .created(URI.create(String.format("/users/%d", savedUser.getId())))
                 .body(savedUser);
@@ -41,8 +41,8 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<String> updatePost(@PathVariable long id,
-                                             @Valid @RequestBody UserInputDto updatedUserInputDto) {
-        userService.updateUser(id, updatedUserInputDto);
+                                             @Valid @RequestBody UserSaveDto updatedUserSaveDto) {
+        userService.updateUser(id, updatedUserSaveDto);
         return ResponseEntity.ok().body("Post updated successfully");
     }
 
