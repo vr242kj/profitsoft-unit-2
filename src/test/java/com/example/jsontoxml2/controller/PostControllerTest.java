@@ -249,6 +249,8 @@ class PostControllerTest {
     void testGetPostList() throws Exception {
         // Given
         createPost("Title 1", "Content 1", true, userId);
+        createPost("Title 2", "Content 2", true, userId);
+        createPost("Title 3", "Content 3", true, userId);
 
         int page = 0;
         int size = 3;
@@ -272,10 +274,11 @@ class PostControllerTest {
         Map<String, Object> responseMap = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<Map<String, Object>>() {
         });
         List<Map<String, Object>> posts = (List<Map<String, Object>>) responseMap.get("list");
-        assertEquals(1, posts.size(), "Should return 1 published posts for the given user");
+        assertEquals(3, posts.size(), "Should return 3 published posts for the given user");
 
         List<String> postTitles = posts.stream().map(post -> (String) post.get("title")).toList();
         assertTrue(postTitles.contains("Title 1"), "Should contain post with title 'Title 1'");
+        assertTrue(postTitles.contains("Title 3"), "Should contain post with title 'Title 3'");
     }
 
     @Test

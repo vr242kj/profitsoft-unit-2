@@ -9,8 +9,3 @@ services:
       POSTGRES_DB: social_media
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: Olimp123
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-
-volumes:
-  postgres-data:
