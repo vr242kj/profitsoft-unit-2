@@ -1,11 +1,40 @@
-version: '3'
+version: "3.8"
+
 services:
-   postgres:
-    image: postgres:13
-    container_name: db_social_media
-    ports:
-      - "5436:5432"
+  postgres:
+    image: postgres
+    container_name: postgres
+    restart: always
     environment:
-      POSTGRES_DB: social_media
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: Olimp123
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=Olimp123
+      - POSTGRES_DB=social_media
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - mynetwork
+
+  app:
+    container_name: app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '8181:8181'
+    restart: on-failure
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/social_media
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: Olimp123
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "true"
+    depends_on:
+      - postgres
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    driver: bridge

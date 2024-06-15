@@ -7,6 +7,7 @@ import com.example.jsontoxml2.repository.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,8 @@ public class UserService {
     private final ModelMapper modelMapper;
     private final KafkaTemplate<String, String> kafkaTemplate;
 
+    @Value("${kafka.topic.email}")
+    private String emailTopic;
 
     public List<UserInfoDto> getAllUsers() {
         List<User> users = userRepository.findAll();
@@ -39,7 +42,7 @@ public class UserService {
         User savedUser = userRepository.save(user);
 
         String recipientEmail = newUserSaveDto.getEmail();
-        kafkaTemplate.send("email-topic", recipientEmail);
+        kafkaTemplate.send(emailTopic, recipientEmail);
 
         return modelMapper.map(savedUser, UserInfoDto.class);
     }
