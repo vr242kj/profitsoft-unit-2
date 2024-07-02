@@ -10,22 +10,27 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -53,6 +58,9 @@ class UserControllerTest {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @MockBean
+    private KafkaTemplate<String, String> kafkaTemplate;
 
     private static User user;
 
@@ -93,6 +101,9 @@ class UserControllerTest {
         // Given
         UserSaveDto userSaveDto = new UserSaveDto("jane smith", "jane.smith@example.com");
 
+        // Mock Kafka producer behavior
+        Mockito.when(kafkaTemplate.send(Mockito.anyString(), Mockito.anyString()))
+                .thenReturn(CompletableFuture.completedFuture(null));
         // When
         MvcResult mvcResult = mvc.perform(post("/api/v1/users")
                         .contentType(MediaType.APPLICATION_JSON)
